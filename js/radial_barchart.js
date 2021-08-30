@@ -21,6 +21,7 @@ Promise.all([
   ]).then(function(data) {
 
     var barData = data[0]
+    //var pieData = data[1]
 
     // X scale
     var x = d3.scaleBand()
@@ -36,7 +37,7 @@ Promise.all([
     // Color scale to color bars according to median time spent abroad
     var barColor = d3.scaleLinear()
         .domain([d3.min(barData.map(d => d.median_timespent_abroad)), d3.max(barData.map(d => d.median_timespent_abroad))])
-        .range(['#F5F5F5', '#808080']);
+        .range(['#BEBEBE', '#303030']);
 
     // Add bars
     svg.append("g")
@@ -53,6 +54,38 @@ Promise.all([
             .padAngle(0.01)
             .padRadius(innerRadius))
 
+    // Add radial y axis with values of return rate
+    var yAxis = svg.append("g")
+        .attr("text-anchor", "middle");
+
+    var yTick = yAxis
+      .selectAll("g")
+      .data(y.ticks(5).slice(1))
+      .enter().append("g");
+
+    yTick.append("circle")
+        .attr("fill", "none")
+        .attr("stroke", "black")
+        .attr("r", y);
+
+    yTick.append("text")
+        .attr("y", function(d) { return -y(d); })
+        .attr("dy", "0.35em")
+        .attr("fill", "none")
+        .attr("stroke", "#ffffffdd")
+        .attr("stroke-width", 5)
+        .text(y.tickFormat(5, "s"));
+
+    yTick.append("text")
+        .attr("y", function(d) { return -y(d); })
+        .attr("dy", "0.35em")
+        .text(y.tickFormat(5, "s"));
+
+    yAxis.append("text")
+        .attr("y", function(d) { return -y(y.ticks(5).pop()); })
+        .attr("dy", "-1em")
+        .text("Return Rate");
+
     // Add the labels
     svg.append("g")
         .selectAll("g")
@@ -68,6 +101,58 @@ Promise.all([
           .attr("alignment-baseline", "middle")
 
 });
+
+// Function to draw the pie chart based on the home_country bar that the user is hovering over
+function drawPieChart(pieData_homeCountry) {
+
+  // set the dimensions and margins of the graph
+  var width = windowHeight / 4
+      height = windowHeight / 4
+      margin = 0 //can adjust later
+
+  // The radius of the pieplot is half the width or half the height (smallest one). I subtract a bit of margin.
+  var radius = Math.min(width, height) / 2 - margin
+
+  // append the svg object to the div called 'my_dataviz'
+  var svg = d3.select("#radial-chart")
+    .append("svg")
+      .attr("width", width)
+      .attr("height", height)
+    .append("g")
+      .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+  // Format of data - DELETE LATER
+  // pieData.home_country = {dest1: 9, dest2: 20, dest3:30, dest4:8, dest5:12, dest6: 2}
+
+  // set the color scale
+  var color = d3.scaleOrdinal()
+    .domain(pieData_homeCountry)
+    .range(d3.schemeSet2);
+
+  // Compute the position of each group on the pie:
+  var pie = d3.pie()
+    .value(function(d) {return d.value; })
+  var data_ready = pie(d3.entries(pieData_homeCountry))
+  // Now I know that group A goes from 0 degrees to x degrees and so on.
+
+  // shape helper to build arcs:
+  var arcGenerator = d3.arc()
+    .innerRadius(0)
+    .outerRadius(radius)
+
+  // Build the pie chart: Basically, each part of the pie is a path that we build using the arc function.
+  svg
+    .selectAll('mySlices')
+    .data(data_ready)
+    .enter()
+    .append('path')
+      .attr('d', arcGenerator)
+      .attr('fill', function(d){ return(color(d.pieData_homeCountry.key)) })
+      .attr("stroke", "black")
+      .style("stroke-width", "2px")
+      .style("opacity", 0.7)
+
+}
 
 
 

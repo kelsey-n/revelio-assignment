@@ -33,13 +33,18 @@ Promise.all([
         .range([innerRadius, outerRadius])   // Domain will be define later.
         .domain([d3.min(barData.map(d => d.return_rate)), d3.max(barData.map(d => d.return_rate))]); // Domain of Y is from the min to the max seen in the data
 
+    // Color scale to color bars according to median time spent abroad
+    var barColor = d3.scaleLinear()
+        .domain([d3.min(barData.map(d => d.median_timespent_abroad)), d3.max(barData.map(d => d.median_timespent_abroad))])
+        .range(['#F5F5F5', '#808080']);
+
     // Add bars
     svg.append("g")
       .selectAll("path")
       .data(barData)
       .enter()
       .append("path")
-        .attr("fill", "#69b3a2")
+        .attr("fill", function(d) { return barColor(d.median_timespent_abroad); })
         .attr("d", d3.arc()     // imagine your doing a part of a donut plot
             .innerRadius(innerRadius)
             .outerRadius(function(d) { return y(d.return_rate); })

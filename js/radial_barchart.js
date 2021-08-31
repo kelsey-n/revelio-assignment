@@ -34,6 +34,7 @@ var pie_svg = d3.select("#radial-chart")
     .attr("width", pie_width)
     .attr("height",  pie_height)
     .attr('transform', `translate(${windowWidth/2 - radius}, ${-windowHeight/2 - radius - 4})`)
+    .attr('class', 'pie-chart')
     //.style("opacity", 0)
   .append("g")
     .attr("transform", "translate(" + pie_width / 2 + "," + pie_height / 2 + ")")
@@ -84,27 +85,43 @@ Promise.all([
             .padAngle(0.01)
             .padRadius(innerRadius))
 
-    bars.on("mouseover", function(event, d) { //draw pie chart when a path is hovered over
+    // Define the div for the tooltip to show when hovering over bars, and hide it with opacity 0
+    var tooltip = d3.select("body").append("div")
+        .attr("class", "tooltip")
+        .style("opacity", 0);
+
+    bars.on("mouseenter", function(event, d) { //do 2 things on bar mouseover: 1- draw pie chart; 2- show tooltip
         d3.select(this).transition()
              .duration('10')
              .attr('opacity', '0.85')
         var pieData_homeCountry = pieData.filter(row => row.home_country == d.home_country)
         var pieData_toplot = Object.entries(pieData_homeCountry[0])
           .filter(row => row[1] > 0)
-
         drawPieChart(pieData_toplot)
-        //console.log(pieData_toplot)
         pie_svg.style('opacity', 1)
-        //drawPieChart(pieData_toplot)
+        tooltip.transition()
+            .duration(200)
+            .style("opacity", .9);
       });
 
-    bars.on("mouseout", function(d) {
+    bars.on("mousemove", function(event, d) {
+      pie_svg.style('opacity', 1)
+      tooltip.html(d.home_country + "<br/>"  + d.return_rate + "% return rate"  + "<br/>"  + d.median_timespent_abroad + " median years abroad")
+          .style("left", (event.pageX + 15) + "px")
+          .style("top", (event.pageY + 15) + "px");
+    })
+
+    bars.on("mouseleave", function(event, d) {
         d3.select(this).transition()
                  .duration('10')
                  .attr('opacity', '1');
         //drawPieChart([["",0],["",0],["",0],["",0],["",0],["",0]])
         pie_svg.selectAll("*").remove(); // clear the pie chart on mouseout
         //pie_svg.style('opacity', '0')
+        tooltip.transition()
+            .duration(500)
+            .style("opacity", 0);
+
       });
 
 

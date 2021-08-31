@@ -369,10 +369,12 @@ function drawPieChart(pieData_homeCountry) {
         .text(function(d){ return d.data[0]})
         .attr("transform", function(d) {
           var midAngle = d.endAngle < Math.PI ? d.startAngle/2 + d.endAngle/2 : d.startAngle/2  + d.endAngle/2 + Math.PI ;
-          return "translate(" + labelArc.centroid(d)[0] + "," + labelArc.centroid(d)[1] + ") rotate(-90) rotate(" + (midAngle * 180/Math.PI) + ")"; })
-          //return (x(d.home_country) + x.bandwidth() / 2 + Math.PI) % (2 * Math.PI) < Math.PI ? "rotate(180)" : "rotate(0)"; })
+          var extraRotation = d.endAngle-d.startAngle > Math.PI ? "rotate(180)" : "rotate(0)"
+          return "translate(" + labelArc.centroid(d)[0] + "," + labelArc.centroid(d)[1] + ") rotate(-90) rotate(" + (midAngle * 180/Math.PI) + ")" + extraRotation; })
+          //return "translate(" + labelArc.centroid(d)[0] + "," + labelArc.centroid(d)[1] + ") rotate(-90) rotate(" + (midAngle * 180/Math.PI) + ")"; })
         .style("font-size", "11px")
         //.attr("dy", ".35em")
+        //.attr("text-anchor", function(d) { return (labelArc(d) + (d.endAngle-d.startAngle)/2 + Math.PI) % (2 * Math.PI) < Math.PI ? "end" : "start"; })
         .attr("text-anchor", "middle")
 
   // pie_svg.append("text")

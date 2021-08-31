@@ -40,7 +40,7 @@ var pie_svg = d3.select("#radial-chart")
     .attr("transform", "translate(" + pie_width / 2 + "," + pie_height / 2 + ")")
 
 Promise.all([
-    d3.csv("https://raw.githubusercontent.com/kelsey-n/revelio-assignment/main/data/returnRate_medianTimespent_filtered.csv", d3.autoType),
+    d3.csv("https://raw.githubusercontent.com/kelsey-n/revelio-assignment/main/data/returnRate_medianTimespent_filtered2.csv", d3.autoType),
     d3.csv("https://raw.githubusercontent.com/kelsey-n/revelio-assignment/main/data/destinationsByHomeCountry_Summary2.csv", d3.autoType)
   ]).then(function(data) {
 

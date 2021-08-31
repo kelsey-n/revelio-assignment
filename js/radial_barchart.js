@@ -5,7 +5,6 @@ var windowHeight = window.innerHeight
 // document.getElementById('pie-chart').setAttribute("margin-left", (windowWidth / 2));
 // document.getElementById('pie-chart').setAttribute("margin-top", windowHeight / 2);
 
-
 // set the dimensions and margins of the graph
 var margin = {top: 0, right: 0, bottom: 0, left: 0},
     width = windowWidth - margin.left - margin.right,
@@ -22,8 +21,8 @@ var svg = d3.select("#radial-chart")
     .attr("transform", "translate(" + width / 2 + "," + ( height/2 )+ ")"); // Add 100 on Y translation, cause upper bars are longer
 
 // set the dimensions and margins of the pie chart
-var pie_width = windowHeight / 3.2
-    pie_height = windowHeight / 3.2
+var pie_width = windowHeight / 4
+    pie_height = windowHeight / 4
     pie_margin = 0
 
 // The radius of the pieplot is half the width or half the height (smallest one). I subtract a bit of margin.
@@ -94,6 +93,7 @@ Promise.all([
           .filter(row => row[1] > 0)
 
         drawPieChart(pieData_toplot)
+        //console.log(pieData_toplot)
         pie_svg.style('opacity', 1)
         //drawPieChart(pieData_toplot)
       });
@@ -102,7 +102,9 @@ Promise.all([
         d3.select(this).transition()
                  .duration('10')
                  .attr('opacity', '1');
-        pie_svg.style('opacity', '0')
+        //drawPieChart([["",0],["",0],["",0],["",0],["",0],["",0]])
+        pie_svg.selectAll("*").remove(); // clear the pie chart on mouseout
+        //pie_svg.style('opacity', '0')
       });
 
 
@@ -152,6 +154,20 @@ Promise.all([
           .style("font-size", "11px")
           .attr("alignment-baseline", "middle")
 
+    // Add legend for bar colors using d3-legend library
+    svg.append("g")
+      .attr("class", "legendLinear")
+      .attr("transform", "translate(20,20)");
+
+    var legendLinear = d3.legendColor()
+      .shapeWidth(30)
+      .orient('horizontal')
+      .title('Median Years Spent Abroad')
+      .scale(barColor);
+
+    svg.select(".legendLinear")
+      .attr("transform", `translate(${windowWidth/4}, ${-windowHeight/2.3})`)
+      .call(legendLinear);
 });
 
 // Function to draw the pie chart based on the home_country bar that the user is hovering over
@@ -174,6 +190,10 @@ function drawPieChart(pieData_homeCountry) {
     .innerRadius(0)
     .outerRadius(radius)
 
+  var labelArc = d3.arc()
+    .outerRadius(radius)
+    .innerRadius(5);
+
 //console.log(data_ready)
   // Build the pie chart: Basically, each part of the pie is a path that we build using the arc function.
   pie_svg
@@ -187,14 +207,24 @@ function drawPieChart(pieData_homeCountry) {
       .style("stroke-width", "0px")
 
   // Now add the annotation. Use the centroid method to get the best coordinates
-  pie_svg
+  pie_svg.append('g')
     .selectAll('mySlices')
     .data(data_ready)
     .join('text')
     .text(function(d){ return d.data[0]})
-    .attr("transform", function(d) { return `translate(${arcGenerator.centroid(d)})`})
-    .style("text-anchor", "middle")
+    .attr("transform", function(d) { return "translate(" + labelArc.centroid(d)[0] + "," + labelArc.centroid(d)[1] + ") rotate(-90) rotate(" + d.endAngle < Math.PI ? (d.startAngle / 2 + d.endAngle / 2) * 180 / Math.PI : (d.startAngle / 2 + d.endAngle / 2 + Math.PI) * 180 / Math.PI + ")" }) //function(d) { return `translate(${arcGenerator.centroid(d)})`})
+    .style("text-anchor", "middle").attr("alignment-baseline", "middle")
     .style("font-size", 11)
+
+  // pie_svg.selectAll('mySlices')
+  // .data(data_ready)
+  // .join("text")
+  // .text(function(d) { return d.data[0]})
+  // .attr("transform", function(d) {
+  //   console.log("translate(" + labelArc.centroid(d)[0] + "," + labelArc.centroid(d)[1] + ") rotate(-90) rotate(" + (d.endAngle < Math.PI ? d.startAngle/2 + d.endAngle/2 : d.startAngle/2  + d.endAngle/2 + Math.PI * 180/Math.PI) + ")")
+  //   return "translate(" + labelArc.centroid(d)[0] + "," + labelArc.centroid(d)[1] + ") rotate(-90) rotate(" + (d.endAngle < Math.PI ? d.startAngle/2 + d.endAngle/2 : d.startAngle/2  + d.endAngle/2 + Math.PI * 180/Math.PI) + ")"; })
+  // .attr("dy", ".35em")
+  // .attr('text-anchor','middle');
 
 }
 

@@ -63,7 +63,7 @@ Promise.all([
     // Y scale
     var y = d3.scaleRadial()
         .range([innerRadius, outerRadius])   // Domain will be define later.
-        .domain([d3.min(barData.map(d => d.return_rate)), d3.max(barData.map(d => d.return_rate))]); // Domain of Y is from the min to the max seen in the data
+        .domain([0, d3.max(barData.map(d => d.return_rate))]); // Domain of Y is from the min to the max seen in the data
 
     // Color scale to color bars according to median time spent abroad
     var barColor = d3.scaleLinear()

@@ -346,14 +346,45 @@ function drawPieChart(pieData_homeCountry) {
       .style("stroke-width", "0px")
 
   // Now add the annotation. Use the centroid method to get the best coordinates
-  pie_svg.append('g')
-    .selectAll('mySlices')
-    .data(data_ready)
-    .join('text')
-    .text(function(d){ return d.data[0]})
-    .attr("transform", function(d) { return "translate(" + labelArc.centroid(d) + ") rotate(-90) rotate(" + d.endAngle < Math.PI ? (d.startAngle / 2 + d.endAngle / 2) * 180 / Math.PI : (d.startAngle / 2 + d.endAngle / 2 + Math.PI) * 180 / Math.PI + ")" }) //function(d) { return `translate(${arcGenerator.centroid(d)})`})
-    .style("text-anchor", "middle").attr("alignment-baseline", "middle")
-    .style("font-size", 11)
+  // pie_svg.append('g')
+  //   .selectAll('mySlices')
+  //   .data(data_ready)
+  //   .enter()
+  //   .append('text')
+  //   .text(function(d){ return d.data[0]})
+  //   .attr("transform", function(d) { return "translate(" + labelArc.centroid(d) + ") rotate(-90) rotate(" + d.endAngle < Math.PI ? (d.startAngle / 2 + d.endAngle / 2) * 180 / Math.PI : (d.startAngle / 2 + d.endAngle / 2 + Math.PI) * 180 / Math.PI + ")" }) //function(d) { return `translate(${arcGenerator.centroid(d)})`})
+  //   .style("text-anchor", "middle").attr("alignment-baseline", "middle")
+  //   .style("font-size", 11)
+
+  // Label the pie chart, adapting the rotating labels from the radial bars
+  pie_svg.append("g")
+      .selectAll("mySlices")
+      .data(data_ready)
+      .enter()
+      //.append("g")
+        //.attr("text-anchor", function(d) { return (arcGenerator(d) + (d.endAngle-d.startAngle)/2 + Math.PI) % (2 * Math.PI) < Math.PI ? "end" : "start"; })
+        //.attr("transform", function(d) { return "rotate(" + ((arcGenerator(d) + (d.endAngle-d.startAngle)/2) * 180 / Math.PI - 90) + ")"+"translate(" + (arcGenerator.centroid(d)+10) + ",0)"; })
+        //.attr("transform", function(d) { return "rotate(" + (((d.endAngle-d.startAngle)/2) * 180 / Math.PI - 90) + ")"+"translate(" + arcGenerator.centroid(d) + ")"; })
+      .append("text")
+        .text(function(d){ return d.data[0]})
+        .attr("transform", function(d) {
+          var midAngle = d.endAngle < Math.PI ? d.startAngle/2 + d.endAngle/2 : d.startAngle/2  + d.endAngle/2 + Math.PI ;
+          return "translate(" + labelArc.centroid(d)[0] + "," + labelArc.centroid(d)[1] + ") rotate(-90) rotate(" + (midAngle * 180/Math.PI) + ")"; })
+          //return (x(d.home_country) + x.bandwidth() / 2 + Math.PI) % (2 * Math.PI) < Math.PI ? "rotate(180)" : "rotate(0)"; })
+        .style("font-size", "11px")
+        //.attr("dy", ".35em")
+        .attr("text-anchor", "middle")
+
+  // pie_svg.append("text")
+  //   .data(data_ready)
+  //   .attr("transform", function(d) {
+  //     console.log(d)
+  //     var midAngle = d.endAngle < Math.PI ? d.startAngle/2 + d.endAngle/2 : d.startAngle/2  + d.endAngle/2 + Math.PI ;
+  //     return "translate(" + labelArc.centroid(d)[0] + "," + labelArc.centroid(d)[1] + ") rotate(-90) rotate(" + (midAngle * 180/Math.PI) + ")"; })
+  //   .attr("dy", ".35em")
+  //   .attr('text-anchor','middle')
+  //   .text(function(d) { return d.data[0] });
+
 
   // pie_svg.selectAll('mySlices')
   // .data(data_ready)

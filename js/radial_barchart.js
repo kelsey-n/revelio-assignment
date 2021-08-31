@@ -56,7 +56,7 @@ Promise.all([
 
     // X scale
     var x = d3.scaleBand()
-        .range([0, 2 * Math.PI])    // X axis goes from 0 to 2pi = all around the circle. If I stop at 1Pi, it will be around a half circle
+        .range([0, 2 * Math.PI])
         .align(0)                  // This does nothing ?
         .domain( barData.map(function(d) { return d.home_country; }) ); // The domain of the X axis is the list of countries.
 
@@ -107,8 +107,10 @@ Promise.all([
     bars.on("mousemove", function(event, d) {
       pie_svg.style('opacity', 1)
       tooltip.html(d.home_country + "<br/>"  + d.return_rate + "% return rate"  + "<br/>"  + d.median_timespent_abroad + " median years abroad")
-          .style("left", (event.pageX + 15) + "px")
-          .style("top", (event.pageY + 15) + "px");
+          //.style("left", (event.pageX + 15) + "px")
+          //.style("top", (event.pageY + 15) + "px");
+          .style("left", (event.pageX - 155) + "px")
+          .style("top", (event.pageY -55) + "px");
     })
 
     bars.on("mouseleave", function(event, d) {
@@ -285,25 +287,37 @@ Promise.all([
     svg.selectAll(".notes")
       .call(wrap, windowWidth/2 - outerRadius);
 
+    svg.append("path")
+    .attr("id", "highest") //Unique id of the path
+    .attr("d", d3.arc()
+        .innerRadius(0)
+        .outerRadius(windowHeight/2)
+        .startAngle(0)
+        .endAngle(Math.PI))
+    .style("fill", "none")
+    //Create an SVG text element and append a textPath element
+    svg.append("text")
+     .append("textPath") //append a textPath to the text element
+      .attr("xlink:href", "#highest") //place the ID of the path here
+      .style("text-anchor","middle") //place the text halfway on the arc
+      .attr("startOffset", "30%")
+      .text("Highest");
 
-    // svg.append("g")
-    //   .enter().append("text")
-    //   //.attr("transform", `translate(${-windowWidth/3}, ${-windowHeight/2.2})`)
-    //   .text("Hover over a bar to see destination countries by home country")
-    //
-    // Wrap text in a rectangle, and size the text to fit.
-    // d3plus.textWrap()
-    //   .container(d3.select("#text-box-test"))
-    //   .resize(true)
-    //   .width(20)
-    //   .draw();
-    //
-    // new d3plus.TextBox()
-    //   .data([{text: "Hover over a bar to see destination countries by home country"}])
-    //   .fontSize(16)
-    //   .width(200)
-    //   //.x(function(d, i) { return i * 250; })
-    //   .render()
+    svg.append("path")
+    .attr("id", "lowest") //Unique id of the path
+    .attr("d", d3.arc()
+        .innerRadius(0)
+        .outerRadius(outerRadius)
+        .startAngle(0)
+        .endAngle(2*Math.PI))
+    .style("fill", "none")
+    //Create an SVG text element and append a textPath element
+    svg.append("text")
+     .append("textPath") //append a textPath to the text element
+      .attr("xlink:href", "#lowest") //place the ID of the path here
+      .style("text-anchor","middle") //place the text halfway on the arc
+      .attr("startOffset", "75%")
+      .text("Lowest");
 
 });
 
@@ -345,58 +359,20 @@ function drawPieChart(pieData_homeCountry) {
       .attr("stroke", "black")
       .style("stroke-width", "0px")
 
-  // Now add the annotation. Use the centroid method to get the best coordinates
-  // pie_svg.append('g')
-  //   .selectAll('mySlices')
-  //   .data(data_ready)
-  //   .enter()
-  //   .append('text')
-  //   .text(function(d){ return d.data[0]})
-  //   .attr("transform", function(d) { return "translate(" + labelArc.centroid(d) + ") rotate(-90) rotate(" + d.endAngle < Math.PI ? (d.startAngle / 2 + d.endAngle / 2) * 180 / Math.PI : (d.startAngle / 2 + d.endAngle / 2 + Math.PI) * 180 / Math.PI + ")" }) //function(d) { return `translate(${arcGenerator.centroid(d)})`})
-  //   .style("text-anchor", "middle").attr("alignment-baseline", "middle")
-  //   .style("font-size", 11)
-
   // Label the pie chart, adapting the rotating labels from the radial bars
   pie_svg.append("g")
       .selectAll("mySlices")
       .data(data_ready)
       .enter()
-      //.append("g")
-        //.attr("text-anchor", function(d) { return (arcGenerator(d) + (d.endAngle-d.startAngle)/2 + Math.PI) % (2 * Math.PI) < Math.PI ? "end" : "start"; })
-        //.attr("transform", function(d) { return "rotate(" + ((arcGenerator(d) + (d.endAngle-d.startAngle)/2) * 180 / Math.PI - 90) + ")"+"translate(" + (arcGenerator.centroid(d)+10) + ",0)"; })
-        //.attr("transform", function(d) { return "rotate(" + (((d.endAngle-d.startAngle)/2) * 180 / Math.PI - 90) + ")"+"translate(" + arcGenerator.centroid(d) + ")"; })
       .append("text")
         .text(function(d){ return d.data[0]})
         .attr("transform", function(d) {
           var midAngle = d.endAngle < Math.PI ? d.startAngle/2 + d.endAngle/2 : d.startAngle/2  + d.endAngle/2 + Math.PI ;
           var extraRotation = d.endAngle-d.startAngle > Math.PI ? "rotate(180)" : "rotate(0)"
           return "translate(" + labelArc.centroid(d)[0] + "," + labelArc.centroid(d)[1] + ") rotate(-90) rotate(" + (midAngle * 180/Math.PI) + ")" + extraRotation; })
-          //return "translate(" + labelArc.centroid(d)[0] + "," + labelArc.centroid(d)[1] + ") rotate(-90) rotate(" + (midAngle * 180/Math.PI) + ")"; })
         .style("font-size", "11px")
-        //.attr("dy", ".35em")
         //.attr("text-anchor", function(d) { return (labelArc(d) + (d.endAngle-d.startAngle)/2 + Math.PI) % (2 * Math.PI) < Math.PI ? "end" : "start"; })
         .attr("text-anchor", "middle")
-
-  // pie_svg.append("text")
-  //   .data(data_ready)
-  //   .attr("transform", function(d) {
-  //     console.log(d)
-  //     var midAngle = d.endAngle < Math.PI ? d.startAngle/2 + d.endAngle/2 : d.startAngle/2  + d.endAngle/2 + Math.PI ;
-  //     return "translate(" + labelArc.centroid(d)[0] + "," + labelArc.centroid(d)[1] + ") rotate(-90) rotate(" + (midAngle * 180/Math.PI) + ")"; })
-  //   .attr("dy", ".35em")
-  //   .attr('text-anchor','middle')
-  //   .text(function(d) { return d.data[0] });
-
-
-  // pie_svg.selectAll('mySlices')
-  // .data(data_ready)
-  // .join("text")
-  // .text(function(d) { return d.data[0]})
-  // .attr("transform", function(d) {
-  //   console.log("translate(" + labelArc.centroid(d)[0] + "," + labelArc.centroid(d)[1] + ") rotate(-90) rotate(" + (d.endAngle < Math.PI ? d.startAngle/2 + d.endAngle/2 : d.startAngle/2  + d.endAngle/2 + Math.PI * 180/Math.PI) + ")")
-  //   return "translate(" + labelArc.centroid(d)[0] + "," + labelArc.centroid(d)[1] + ") rotate(-90) rotate(" + (d.endAngle < Math.PI ? d.startAngle/2 + d.endAngle/2 : d.startAngle/2  + d.endAngle/2 + Math.PI * 180/Math.PI) + ")"; })
-  // .attr("dy", ".35em")
-  // .attr('text-anchor','middle');
 
 }
 

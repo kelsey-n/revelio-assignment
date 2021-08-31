@@ -168,7 +168,129 @@ Promise.all([
     svg.select(".legendLinear")
       .attr("transform", `translate(${windowWidth/4}, ${-windowHeight/2.3})`)
       .call(legendLinear);
+
+    // Add title
+    svg
+      .append("text")
+      .attr("class", "title")
+      .attr("transform", `translate(${-windowWidth/3}, ${-windowHeight/2.2})`)
+      .text("Working ~Away~ From Home")
+    // fit title into a third of the window width by calling the wrap function defined below (taken from Mike Bostock)
+    svg.select(".title")
+      .call(wrap, windowWidth/3);
+
+    svg
+      .append("text")
+      .attr("class", "instructions-center")
+      .style("font-size", "11px")
+      .attr("text-anchor", "middle")
+      //.attr("x", windowWidth/2 - radius*2)
+      //.attr("transform", `translate(0, ${-radius/4})`)
+      .text("Destinations will appear here!")
+    // fit instructions into the circle of the pie chart
+    svg.select(".instructions-center")
+      .call(wrap, radius);
+
+    svg
+      .append("text")
+      .attr("class", "instructions")
+      .style("font-size", "12px")
+      .attr("text-anchor", "end")
+      .attr("transform", `translate(${-outerRadius}, ${-windowHeight/3})`)
+      .text("Hover over a bar to see destination countries by that home country")
+    // wrap text
+    svg.select(".instructions")
+      .call(wrap, innerRadius);
+
+    var lineBreak = 20
+
+    svg
+      .append("text")
+      .attr("class", "takeaways")
+      .style("font-size", "15px")
+      .attr("text-anchor", "middle")
+      .attr("transform", `translate(${-windowWidth/3}, 0)`)
+      .text("Takeaways")
+    svg
+      .append("text")
+      .attr("class", "takeaways")
+      .style("font-size", "12px")
+      .attr("text-anchor", "middle")
+      .attr("transform", `translate(${-windowWidth/3}, ${lineBreak})`)
+      .text("Insert Takeaway 1 here.................. ........................................................ .........................................................")
+    svg
+      .append("text")
+      .attr("class", "takeaways")
+      .style("font-size", "12px")
+      .attr("text-anchor", "middle")
+      .attr("transform", `translate(${-windowWidth/3}, ${lineBreak*3})`)
+      .text("Insert Takeaway 2 here.................. ........................................................ .........................................................")
+    svg
+      .append("text")
+      .attr("class", "takeaways")
+      .style("font-size", "12px")
+      .attr("text-anchor", "middle")
+      .attr("transform", `translate(${-windowWidth/3}, ${lineBreak*5})`)
+      .text("Insert Takeaway 3 here.................. ........................................................ .........................................................")
+    // wrap text
+    svg.selectAll(".takeaways")
+      .call(wrap, windowWidth/2 - outerRadius);
+
+    svg
+      .append("text")
+      .attr("class", "notes")
+      .style("font-size", "15px")
+      .attr("text-anchor", "middle")
+      .attr("transform", `translate(${windowWidth/3}, ${windowHeight/4})`)
+      .text("Notes on the Data")
+    svg
+      .append("text")
+      .attr("class", "notes")
+      .style("font-size", "12px")
+      .attr("text-anchor", "middle")
+      .attr("transform", `translate(${windowWidth/3}, ${windowHeight/4 + lineBreak})`)
+      .text("Insert Note 1 here.................. ........................................................ .........................................................")
+    svg
+      .append("text")
+      .attr("class", "notes")
+      .style("font-size", "12px")
+      .attr("text-anchor", "middle")
+      .attr("transform", `translate(${windowWidth/3}, ${windowHeight/4 + lineBreak*3})`)
+      .text("Insert Note 2 here.................. ........................................................ .........................................................")
+    svg
+      .append("text")
+      .attr("class", "notes")
+      .style("font-size", "12px")
+      .attr("text-anchor", "middle")
+      .attr("transform", `translate(${windowWidth/3}, ${windowHeight/4 + lineBreak*5})`)
+      .text("Insert Note 3 here.................. ........................................................ .........................................................")
+    // wrap text
+    svg.selectAll(".notes")
+      .call(wrap, windowWidth/2 - outerRadius);
+
+
+    // svg.append("g")
+    //   .enter().append("text")
+    //   //.attr("transform", `translate(${-windowWidth/3}, ${-windowHeight/2.2})`)
+    //   .text("Hover over a bar to see destination countries by home country")
+    //
+    // Wrap text in a rectangle, and size the text to fit.
+    // d3plus.textWrap()
+    //   .container(d3.select("#text-box-test"))
+    //   .resize(true)
+    //   .width(20)
+    //   .draw();
+    //
+    // new d3plus.TextBox()
+    //   .data([{text: "Hover over a bar to see destination countries by home country"}])
+    //   .fontSize(16)
+    //   .width(200)
+    //   //.x(function(d, i) { return i * 250; })
+    //   .render()
+
 });
+
+
 
 // Function to draw the pie chart based on the home_country bar that the user is hovering over
 function drawPieChart(pieData_homeCountry) {
@@ -212,7 +334,7 @@ function drawPieChart(pieData_homeCountry) {
     .data(data_ready)
     .join('text')
     .text(function(d){ return d.data[0]})
-    .attr("transform", function(d) { return "translate(" + labelArc.centroid(d)[0] + "," + labelArc.centroid(d)[1] + ") rotate(-90) rotate(" + d.endAngle < Math.PI ? (d.startAngle / 2 + d.endAngle / 2) * 180 / Math.PI : (d.startAngle / 2 + d.endAngle / 2 + Math.PI) * 180 / Math.PI + ")" }) //function(d) { return `translate(${arcGenerator.centroid(d)})`})
+    .attr("transform", function(d) { return "translate(" + labelArc.centroid(d) + ") rotate(-90) rotate(" + d.endAngle < Math.PI ? (d.startAngle / 2 + d.endAngle / 2) * 180 / Math.PI : (d.startAngle / 2 + d.endAngle / 2 + Math.PI) * 180 / Math.PI + ")" }) //function(d) { return `translate(${arcGenerator.centroid(d)})`})
     .style("text-anchor", "middle").attr("alignment-baseline", "middle")
     .style("font-size", 11)
 
@@ -228,144 +350,28 @@ function drawPieChart(pieData_homeCountry) {
 
 }
 
-
-
-
-
-
-// var svg = d3.select("#radial-chart"),
-//     width = +svg.attr("width"),
-//     height = +svg.attr("height"),
-//     innerRadius = 50,
-//     outerRadius = Math.min(width, height) / 2.1
-//     g = svg.append("g").attr("transform", "translate(" + width / 2.7 + "," + height / 2 + ")")
-//
-// // var legendsvg = d3.select("#chart4"),
-// //     legendwidth = +legendsvg.attr("width"),
-// //     legendheight = +legendsvg.attr("height"),
-// //     legendg = legendsvg.append("g").attr("transform", "translate(" + legendwidth / 3 + "," + legendheight / 2 + ")")
-//
-// var x = d3.scaleBand()
-//     .range([0, 2 * Math.PI])
-//     .align(0);
-//
-// var y = d3.scaleRadial()
-//     .range([innerRadius, outerRadius]);
-//
-// d3.csv("https://raw.githubusercontent.com/kelsey-n/spotify-data-challenge/main/data/topsongs2010s.csv", function(d, i, columns) {
-//   for (i = 1, t = 0; i < columns.length; ++i) t += d[columns[i]] = +d[columns[i]];
-//   d.total = t;
-//   return d;
-// }).then(function(data) {
-//
-//   var radial_colors = [];
-//   for (let column of data.columns.slice(1)) {radial_colors.push(colors[column])}
-//   var z = d3.scaleOrdinal()
-//       .range(radial_colors);
-//
-//   x.domain(data.map(function(d) { return d.name; }));
-//   y.domain([0, d3.max(data, function(d) { return d.total; })]);
-//   z.domain(data.columns.slice(1));
-//
-//   g.append("g")
-//     .selectAll("g")
-//     .data(d3.stack().keys(data.columns.slice(1))(data))
-//     .enter().append("g")
-//       .attr("fill", function(d) { return z(d.key); })
-//     .selectAll("path")
-//     .data(function(d) { return d; })
-//     .enter().append("path")
-//       .attr("d", d3.arc()
-//           .innerRadius(function(d) { return y(d[0]); })
-//           .outerRadius(function(d) { return y(d[1]); })
-//           .startAngle(function(d) { return x(d.data.name); })
-//           .endAngle(function(d) { return x(d.data.name) + x.bandwidth(); })
-//           .padAngle(0.01)
-//           .padRadius(innerRadius))
-//
-//   var yAxis = g.append("g")
-//       .attr("text-anchor", "middle");
-//
-//   var yTick = yAxis
-//     .selectAll("g")
-//     .data(y.ticks(5).slice(1))
-//     .enter().append("g");
-//
-//   yTick.append("circle")
-//       .attr("fill", "none")
-//       .attr("stroke", "#ffffffdd")
-//       .attr("r", y);
-//
-//   yTick.append("text")
-//       .attr("y", function(d) { return -y(d); })
-//       .attr("dy", "0.35em")
-//       .attr("fill", "none")
-//       .attr("stroke", "#ffffffdd")
-//       .attr("stroke-width", 5)
-//       .text(y.tickFormat(5, "s"));
-//
-//   yTick.append("text")
-//       .attr("y", function(d) { return -y(d); })
-//       .attr("dy", "0.35em")
-//       .text(y.tickFormat(5, "s"));
-//
-//   // yAxis.append("text")
-//   //     .attr("y", function(d) { return -y(y.ticks(5).pop()); })
-//   //     .attr("dy", "-1em")
-//   //     .text("Song Value");
-//
-//   var label = g.append("g")
-//     .selectAll("g")
-//     .data(data)
-//     .enter().append("g")
-//       .attr("text-anchor", function(d) { return (x(d.name) + x.bandwidth() / 2 + Math.PI) % (2 * Math.PI) < Math.PI ? "end" : "start"; })
-//       .attr("transform", function(d) { return "rotate(" + ((x(d.name) + x.bandwidth() / 2) * 180 / Math.PI - 90) + ")translate(" + innerRadius + ",0)"; });
-//
-//   label.append("text")
-//       .attr("transform", function(d) { return (x(d.name) + x.bandwidth() / 2 + Math.PI) % (2 * Math.PI) < Math.PI ? "rotate(180)" : "rotate(0)"; })
-//       .text(function(d) { return d.name; })
-//       .attr("alignment-baseline", "middle")
-//
-//   var legend = g.append("g")
-//     .selectAll("g")
-//     .data(data.columns.slice(1))
-//     .enter().append("g")
-//       .attr("transform", function(d, i) { return "translate(" + width/2.5 +"," + (i - (data.columns.length -1) / 2) * 27 + ")"; });
-//
-//   legend.append("rect")
-//       .attr("width", 18)
-//       .attr("height", 18)
-//       .attr("fill", z);
-//
-//   legend.append("text")
-//       .attr("x", 25)
-//       .attr("y", 9)
-//       .attr("dy", "0.35em")
-//       .attr("fill", "#ffffffdd")
-//       .text(function(d) { return d; });
-//
-//
-//       // Features of the annotation
-//     const annotations = [
-//       {
-//         note: {
-//           label: `Top 10 of the 2010s`,
-//           title: "",
-//           wrap: 80,
-//           padding: -15,
-//         },
-//         color: ["#ffffffdd"],
-//         x: width/2.7 - 37,
-//         y: height/2,
-//         dy: 0,
-//         dx: 0
-//       },
-//     ]
-//
-//     // Add annotation to the chart
-//     const makeAnnotations = d3.annotation()
-//       .annotations(annotations)
-//     d3.select("#radial-chart")
-//       .append("g")
-//       .call(makeAnnotations)
-// });
+// Mike Bostock's text wrap function from https://bl.ocks.org/mbostock/7555321
+function wrap(text, width) {
+  text.each(function() {
+    var text = d3.select(this),
+        words = text.text().split(/\s+/).reverse(),
+        word,
+        line = [],
+        lineNumber = 0,
+        lineHeight = 1.2, // ems
+        //x = text.attr("x"), //removing for equal spacing between lines
+        y = text.attr("y"),
+        dy = 0 //parseFloat(text.attr("dy")) || 0,
+        tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
+    while (word = words.pop()) {
+      line.push(word);
+      tspan.text(line.join(" "));
+      if (tspan.node().getComputedTextLength() > width) {
+        line.pop();
+        tspan.text(line.join(" "));
+        line = [word];
+        tspan = text.append("tspan").attr("x", 0).attr("y", 0).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+      }
+    }
+  });
+}

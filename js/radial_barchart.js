@@ -1,6 +1,5 @@
 var windowWidth = window.innerWidth
 var windowHeight = window.innerHeight
-console.log(window.outerHeight)
 
 // Use JS and CSS to position pie chart div in the middle of the page
 // document.getElementById('pie-chart').setAttribute("margin-left", (windowWidth / 2));
@@ -11,7 +10,7 @@ console.log(window.outerHeight)
 var margin = {top: 0, right: 0, bottom: 0, left: 0},
     width = windowWidth - margin.left - margin.right,
     height = windowHeight - margin.top - margin.bottom,
-    innerRadius = windowHeight / 8,
+    innerRadius = windowHeight / 6,
     outerRadius = Math.min(width, height) / 2 - 50;   // the outerRadius goes from the middle of the SVG area to the border
 
 // append the svg object to the body of the page
@@ -22,6 +21,24 @@ var svg = d3.select("#radial-chart")
   .append("g")
     .attr("transform", "translate(" + width / 2 + "," + ( height/2 )+ ")"); // Add 100 on Y translation, cause upper bars are longer
 
+// set the dimensions and margins of the pie chart
+var pie_width = windowHeight / 3.2
+    pie_height = windowHeight / 3.2
+    pie_margin = 0
+
+// The radius of the pieplot is half the width or half the height (smallest one). I subtract a bit of margin.
+var radius = Math.min(pie_width, pie_height) / 2 - pie_margin
+
+// append svg for the pie chart to the div
+var pie_svg = d3.select("#radial-chart")
+  .append("svg")
+    .attr("width", pie_width)
+    .attr("height",  pie_height)
+    .attr('transform', `translate(${windowWidth/2 - radius}, ${-windowHeight/2 - radius - 4})`)
+    //.style("opacity", 0)
+  .append("g")
+    .attr("transform", "translate(" + pie_width / 2 + "," + pie_height / 2 + ")")
+
 Promise.all([
     d3.csv("https://raw.githubusercontent.com/kelsey-n/revelio-assignment/main/data/returnRate_medianTimespent_filtered.csv", d3.autoType),
     d3.csv("https://raw.githubusercontent.com/kelsey-n/revelio-assignment/main/data/destinationsByHomeCountry_Summary2.csv", d3.autoType)
@@ -29,17 +46,13 @@ Promise.all([
 
     var barData = data[0]
     var pieData = data[1]
-        .filter(row => row.home_country == "Trinidad and Tobago") //include this filter function on hover == d.home_country
-        //.filter(row => )
-    var test = Object.entries(pieData[0])
-        .filter(row => row[1] > 0)
 
-    console.log(Object.keys(pieData[0]).slice(1))
-    console.log(Object.values(pieData[0]).slice(1))
-    console.log(Object.entries(pieData[0]).slice(1))
-    console.log(test)
+    // console.log(Object.keys(pieData[0]).slice(1))
+    // console.log(Object.values(pieData[0]).slice(1))
+    // console.log(Object.entries(pieData[0]).slice(1))
+    // console.log(test)
 
-    drawPieChart(test)
+    //drawPieChart(test)
 
     // X scale
     var x = d3.scaleBand()
@@ -58,7 +71,7 @@ Promise.all([
         .range(['#BEBEBE', '#303030']);
 
     // Add bars
-    svg.append("g")
+    bars = svg.append("g")
       .selectAll("path")
       .data(barData)
       .enter()
@@ -71,6 +84,27 @@ Promise.all([
             .endAngle(function(d) { return x(d.home_country) + x.bandwidth(); })
             .padAngle(0.01)
             .padRadius(innerRadius))
+
+    bars.on("mouseover", function(event, d) { //draw pie chart when a path is hovered over
+        d3.select(this).transition()
+             .duration('10')
+             .attr('opacity', '0.85')
+        var pieData_homeCountry = pieData.filter(row => row.home_country == d.home_country)
+        var pieData_toplot = Object.entries(pieData_homeCountry[0])
+          .filter(row => row[1] > 0)
+
+        drawPieChart(pieData_toplot)
+        pie_svg.style('opacity', 1)
+        //drawPieChart(pieData_toplot)
+      });
+
+    bars.on("mouseout", function(d) {
+        d3.select(this).transition()
+                 .duration('10')
+                 .attr('opacity', '1');
+        pie_svg.style('opacity', '0')
+      });
+
 
     // Add radial y axis with values of return rate
     var yAxis = svg.append("g")
@@ -118,52 +152,31 @@ Promise.all([
           .style("font-size", "11px")
           .attr("alignment-baseline", "middle")
 
-    console.log(window.outerHeight)
-
 });
 
 // Function to draw the pie chart based on the home_country bar that the user is hovering over
 function drawPieChart(pieData_homeCountry) {
 
-  // set the dimensions and margins of the graph
-  var width = windowHeight / 4
-      height = windowHeight / 4
-      margin = 0
-
-  // The radius of the pieplot is half the width or half the height (smallest one). I subtract a bit of margin.
-  var radius = Math.min(width, height) / 2 - margin
-
-  // append the svg object to the div called 'my_dataviz'
-  var svg = d3.select("#radial-chart")
-    .append("svg")
-      .attr("width", width)
-      .attr("height",  height)
-      .attr('transform', `translate(${windowWidth/2 - radius}, ${-window.innerHeight/2 - radius - 4})`)
-    .append("g")
-      .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
-      //.attr("transform", "translate(" + width / 2 + "," + ( height/2+100 )+ ")"); // Add 100 on Y translation, cause upper bars are longer
-
   // set the color scale
   var color = d3.scaleOrdinal()
     .domain(pieData_homeCountry.map(d => d[0]))
-    .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56"]);
+    .range(d3.schemeSet2); //["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56"]
 
-    console.log(pieData_homeCountry.map(d => d[0]))
+    //console.log(pieData_homeCountry.map(d => d[0]))
 
   // Compute the position of each group on the pie:
   var pie = d3.pie()
     .value(function(d) {return d[1]; })
   var data_ready = pie(pieData_homeCountry)
-  // Now I know that group A goes from 0 degrees to x degrees and so on.
 
   // shape helper to build arcs:
   var arcGenerator = d3.arc()
     .innerRadius(0)
     .outerRadius(radius)
 
-console.log(data_ready)
+//console.log(data_ready)
   // Build the pie chart: Basically, each part of the pie is a path that we build using the arc function.
-  svg
+  pie_svg
     .selectAll('mySlices')
     .data(data_ready)
     .enter()
@@ -171,10 +184,17 @@ console.log(data_ready)
       .attr('d', arcGenerator)
       .attr('fill', function(d){ return(color(d.data[0])) })
       .attr("stroke", "black")
-      .style("stroke-width", "2px")
-      .style("opacity", 0.7)
+      .style("stroke-width", "0px")
 
-
+  // Now add the annotation. Use the centroid method to get the best coordinates
+  pie_svg
+    .selectAll('mySlices')
+    .data(data_ready)
+    .join('text')
+    .text(function(d){ return d.data[0]})
+    .attr("transform", function(d) { return `translate(${arcGenerator.centroid(d)})`})
+    .style("text-anchor", "middle")
+    .style("font-size", 11)
 
 }
 

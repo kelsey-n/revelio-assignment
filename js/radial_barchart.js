@@ -324,7 +324,7 @@ Promise.all([
       .attr("xlink:href", "#title") //place the ID of the path here
       .style("text-anchor","middle") //place the text halfway on the arc
       .attr("startOffset", "31%")
-      .attr("font-size", "1.8vh")
+      .attr("font-size", "1vw")
       .text("Return Rate (%)");
 
     svg.append("path")
@@ -333,7 +333,7 @@ Promise.all([
         .innerRadius(0)
         .outerRadius(windowHeight/2)
         .startAngle(0)
-        .endAngle(Math.PI))
+        .endAngle(Math.PI/2*3))
     .style("fill", "none")
     //Create an SVG text element and append a textPath element
     svg.append("text")
@@ -409,9 +409,10 @@ function drawPieChart(pieData_homeCountry) {
       .append("text")
         .text(function(d){ return d.data[0]})
         .attr("transform", function(d) {
-          var midAngle = d.endAngle < Math.PI ? d.startAngle/2 + d.endAngle/2 : d.startAngle/2  + d.endAngle/2 + Math.PI ;
-          var extraRotation = d.endAngle-d.startAngle > Math.PI ? "rotate(180)" : "rotate(0)"
-          return "translate(" + labelArc.centroid(d)[0] + "," + labelArc.centroid(d)[1] + ") rotate(-90) rotate(" + (midAngle * 180/Math.PI) + ")" + extraRotation; })
+          //var midAngle = d.endAngle < Math.PI || ((d.endAngle > Math.PI) && (d.startAngle < Math.PI)) ? d.startAngle/2 + d.endAngle/2 : d.startAngle/2  + d.endAngle/2 + Math.PI ;
+          var midAngle = d.startAngle + ((d.endAngle - d.startAngle)/2) < Math.PI ? d.startAngle/2 + d.endAngle/2 : d.startAngle/2  + d.endAngle/2 + Math.PI ; //startangle + ((end - start) / 2)
+          // var extraRotation = d.endAngle-d.startAngle > Math.PI ? "rotate(180)" : "rotate(0)"
+          return "translate(" + labelArc.centroid(d)[0] + "," + labelArc.centroid(d)[1] + ") rotate(-90) rotate(" + (midAngle * 180/Math.PI) + ")"})
         .style("font-size", "0.7vw")
         //.attr("text-anchor", function(d) { return (labelArc(d) + (d.endAngle-d.startAngle)/2 + Math.PI) % (2 * Math.PI) < Math.PI ? "end" : "start"; })
         .attr("text-anchor", "middle")

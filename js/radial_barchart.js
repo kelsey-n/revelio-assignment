@@ -10,7 +10,7 @@ var margin = {top: 0, right: 0, bottom: 0, left: 0},
     width = windowWidth - margin.left - margin.right,
     height = windowHeight - margin.top - margin.bottom,
     innerRadius = windowHeight / 6,
-    outerRadius = Math.min(width, height) / 2 - 50;   // the outerRadius goes from the middle of the SVG area to the border
+    outerRadius = Math.min(width, height) / 2 - 65;   // the outerRadius goes from the middle of the SVG area to the border, with some extra room for the top longer bars
 
 // append the svg object to the body of the page
 var svg = d3.select("#radial-chart")
@@ -41,18 +41,11 @@ var pie_svg = d3.select("#radial-chart")
 
 Promise.all([
     d3.csv("https://raw.githubusercontent.com/kelsey-n/revelio-assignment/main/data/returnRate_medianTimespent_filtered2.csv", d3.autoType),
-    d3.csv("https://raw.githubusercontent.com/kelsey-n/revelio-assignment/main/data/destinationsByHomeCountry_Summary2.csv", d3.autoType)
+    d3.csv("https://raw.githubusercontent.com/kelsey-n/revelio-assignment/main/data/destinationsByHomeCountry_Summary_final.csv", d3.autoType)
   ]).then(function(data) {
 
     var barData = data[0]
     var pieData = data[1]
-
-    // console.log(Object.keys(pieData[0]).slice(1))
-    // console.log(Object.values(pieData[0]).slice(1))
-    // console.log(Object.entries(pieData[0]).slice(1))
-    // console.log(test)
-
-    //drawPieChart(test)
 
     // X scale
     var x = d3.scaleBand()
@@ -68,7 +61,9 @@ Promise.all([
     // Color scale to color bars according to median time spent abroad
     var barColor = d3.scaleLinear()
         .domain([d3.min(barData.map(d => d.median_timespent_abroad)), d3.max(barData.map(d => d.median_timespent_abroad))])
-        .range(['#BEBEBE', '#303030']);
+        //.range(['#58CCED', '#0047AB'])
+        .range(['#58CCED', '#072F5F'])
+        //.range(['#26E3E0', '#3854BD'])
 
     // Add bars
     bars = svg.append("g")
@@ -133,12 +128,14 @@ Promise.all([
 
     var yTick = yAxis
       .selectAll("g")
-      .data(y.ticks(5).slice(1))
+      //.data(y.ticks(5).slice(2))
+      .data([20,40,50])
       .enter().append("g");
 
     yTick.append("circle")
         .attr("fill", "none")
         .attr("stroke", "black")
+        .attr("stroke-width", 0.5)
         .attr("r", y);
 
     yTick.append("text")
@@ -154,10 +151,10 @@ Promise.all([
         .attr("dy", "0.35em")
         .text(y.tickFormat(5, "s"));
 
-    yAxis.append("text")
-        .attr("y", function(d) { return -y(y.ticks(5).pop()); })
-        .attr("dy", "-1em")
-        .text("Return Rate");
+    // yAxis.append("text")
+    //     .attr("y", function(d) { return -y(y.ticks(5).pop()); })
+    //     .attr("dy", "4em")
+    //     .text("Return Rate (%)");
 
     // Add the labels
     svg.append("g")
@@ -168,10 +165,25 @@ Promise.all([
           .attr("text-anchor", function(d) { return (x(d.home_country) + x.bandwidth() / 2 + Math.PI) % (2 * Math.PI) < Math.PI ? "end" : "start"; })
           .attr("transform", function(d) { return "rotate(" + ((x(d.home_country) + x.bandwidth() / 2) * 180 / Math.PI - 90) + ")"+"translate(" + (y(d.return_rate)+10) + ",0)"; })
         .append("text")
-          .text(function(d){return(d.home_country)})
           .attr("transform", function(d) { return (x(d.home_country) + x.bandwidth() / 2 + Math.PI) % (2 * Math.PI) < Math.PI ? "rotate(180)" : "rotate(0)"; })
-          .style("font-size", "11px")
-          .attr("alignment-baseline", "middle")
+          .style("font-size", "13px")
+          //.attr("alignment-baseline", "middle")
+          .attr("fill", "none")
+          .attr("stroke", "#ffffffdd")
+          .attr("stroke-width", 5)
+          .text(function(d){return(d.home_country)})
+    svg.append("g")
+        .selectAll("g")
+        .data(barData)
+        .enter()
+        .append("g")
+          .attr("text-anchor", function(d) { return (x(d.home_country) + x.bandwidth() / 2 + Math.PI) % (2 * Math.PI) < Math.PI ? "end" : "start"; })
+          .attr("transform", function(d) { return "rotate(" + ((x(d.home_country) + x.bandwidth() / 2) * 180 / Math.PI - 90) + ")"+"translate(" + (y(d.return_rate)+10) + ",0)"; })
+        .append("text")
+          .attr("transform", function(d) { return (x(d.home_country) + x.bandwidth() / 2 + Math.PI) % (2 * Math.PI) < Math.PI ? "rotate(180)" : "rotate(0)"; })
+          .style("font-size", "12px")
+          //.attr("alignment-baseline", "middle")
+          .text(function(d){return(d.home_country)})
 
     // Add legend for bar colors using d3-legend library
     svg.append("g")
@@ -185,7 +197,7 @@ Promise.all([
       .scale(barColor);
 
     svg.select(".legendLinear")
-      .attr("transform", `translate(${windowWidth/4}, ${-windowHeight/2.3})`)
+      .attr("transform", `translate(${windowWidth/3.5}, ${-windowHeight/4})`)
       .call(legendLinear);
 
     // Add title
@@ -193,7 +205,7 @@ Promise.all([
       .append("text")
       .attr("class", "title")
       .attr("transform", `translate(${-windowWidth/3}, ${-windowHeight/2.2})`)
-      .text("Working ~Away~ From Home")
+      .text("Working ~away~ From Home")
     // fit title into a third of the window width by calling the wrap function defined below (taken from Mike Bostock)
     svg.select(".title")
       .call(wrap, windowWidth/3);
@@ -213,13 +225,25 @@ Promise.all([
     svg
       .append("text")
       .attr("class", "instructions")
-      .style("font-size", "12px")
-      .attr("text-anchor", "end")
-      .attr("transform", `translate(${-outerRadius}, ${-windowHeight/3})`)
-      .text("Hover over a bar to see destination countries by that home country")
+      .style("font-size", "15px")
+      .style("font-style", "italic")
+      .attr("text-anchor", "middle")
+      .attr("transform", `translate(${-windowWidth/3}, ${-windowHeight/4})`)
+      .text("Hover over a bar to see destination countries by that home country!")
     // wrap text
     svg.select(".instructions")
-      .call(wrap, innerRadius);
+      .call(wrap, windowWidth/6);
+
+    svg
+      .append("text")
+      .attr("class", "background")
+      .style("font-size", "15px")
+      .attr("text-anchor", "middle")
+      .attr("transform", `translate(${-windowWidth/3}, ${-windowHeight/2.8})`)
+      .text("Explore international migration for work by the home countries with the highest and lowest rates of return.")
+    // wrap text
+    svg.select(".background")
+      .call(wrap, windowWidth/6);
 
     var lineBreak = 20
 
@@ -228,28 +252,28 @@ Promise.all([
       .attr("class", "takeaways")
       .style("font-size", "15px")
       .attr("text-anchor", "middle")
-      .attr("transform", `translate(${-windowWidth/3}, 0)`)
+      .attr("transform", `translate(${-windowWidth/3}, ${windowHeight/4} )`)
       .text("Takeaways")
     svg
       .append("text")
       .attr("class", "takeaways")
       .style("font-size", "12px")
       .attr("text-anchor", "middle")
-      .attr("transform", `translate(${-windowWidth/3}, ${lineBreak})`)
+      .attr("transform", `translate(${-windowWidth/3}, ${windowHeight/4 + lineBreak})`)
       .text("Insert Takeaway 1 here.................. ........................................................ .........................................................")
     svg
       .append("text")
       .attr("class", "takeaways")
       .style("font-size", "12px")
       .attr("text-anchor", "middle")
-      .attr("transform", `translate(${-windowWidth/3}, ${lineBreak*3})`)
+      .attr("transform", `translate(${-windowWidth/3}, ${windowHeight/4 + lineBreak*3})`)
       .text("Insert Takeaway 2 here.................. ........................................................ .........................................................")
     svg
       .append("text")
       .attr("class", "takeaways")
       .style("font-size", "12px")
       .attr("text-anchor", "middle")
-      .attr("transform", `translate(${-windowWidth/3}, ${lineBreak*5})`)
+      .attr("transform", `translate(${-windowWidth/3}, ${windowHeight/4 + lineBreak*5})`)
       .text("Insert Takeaway 3 here.................. ........................................................ .........................................................")
     // wrap text
     svg.selectAll(".takeaways")
@@ -288,6 +312,22 @@ Promise.all([
       .call(wrap, windowWidth/2 - outerRadius);
 
     svg.append("path")
+    .attr("id", "title") //Unique id of the path
+    .attr("d", d3.arc()
+        .innerRadius(0)
+        .outerRadius(outerRadius * 0.8)
+        .startAngle(-Math.PI/2)
+        .endAngle(Math.PI/2))
+    .style("fill", "none")
+    //Create an SVG text element and append a textPath element
+    svg.append("text")
+     .append("textPath") //append a textPath to the text element
+      .attr("xlink:href", "#title") //place the ID of the path here
+      .style("text-anchor","middle") //place the text halfway on the arc
+      .attr("startOffset", "31%")
+      .text("Return Rate (%)");
+
+    svg.append("path")
     .attr("id", "highest") //Unique id of the path
     .attr("d", d3.arc()
         .innerRadius(0)
@@ -301,13 +341,13 @@ Promise.all([
       .attr("xlink:href", "#highest") //place the ID of the path here
       .style("text-anchor","middle") //place the text halfway on the arc
       .attr("startOffset", "30%")
-      .text("Highest");
+      .text("Highest Return Rates");
 
     svg.append("path")
     .attr("id", "lowest") //Unique id of the path
     .attr("d", d3.arc()
         .innerRadius(0)
-        .outerRadius(outerRadius)
+        .outerRadius(outerRadius + ((windowHeight/2 - outerRadius)/2))
         .startAngle(0)
         .endAngle(2*Math.PI))
     .style("fill", "none")
@@ -317,7 +357,7 @@ Promise.all([
       .attr("xlink:href", "#lowest") //place the ID of the path here
       .style("text-anchor","middle") //place the text halfway on the arc
       .attr("startOffset", "75%")
-      .text("Lowest");
+      .text("Lowest Return Rates");
 
 });
 

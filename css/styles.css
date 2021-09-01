@@ -8,12 +8,10 @@
 } */
 
 body {
-  overflow: hidden
+  overflow: hidden;
+  background-color: #f0f4f8;
+  font-family: sans-serif;
 }
-
-/* .svg {
-  position: relative
-} */
 
 .tooltip {
     position: absolute;
@@ -22,8 +20,16 @@ body {
     height: 40px;
     padding: 2px;
     font: 12px sans-serif;
-    background: lightsteelblue;
+    background: #323f4b; /* lightsteelblue; */
+    color: white;
     border: 0px;
     border-radius: 8px;
     pointer-events: none;
+}
+
+.title {
+  font-size: 35px;
+  font-family: monospace;
+  font-weight: bold;
+  fill: #121212;
 }

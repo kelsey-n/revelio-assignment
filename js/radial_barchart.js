@@ -205,15 +205,40 @@ Promise.all([
     svg.select(".instructions-center")
       .call(wrap, radius);
 
+    // Add rect element before text to give appearance of background color for text
+    var textboxWidth = windowWidth*0.4 - outerRadius
+
+    var textbox = svg.append("rect")
+                    .attr("class", "text-box")
+                    .attr("width", textboxWidth)
+                    .attr("height", windowHeight*0.75)
+                    .attr("x", -outerRadius - ((windowWidth/2 - outerRadius) * 0.9))
+                    .attr("y", -windowHeight/2*0.75)
+                    .attr("fill", "white")
+                    .attr("rx", 3)
+                    .attr("ry", 3)
+                    .attr("stroke", "#F5F5F5")
+                    .attr("stroke-width", 3)
+
+    var lineBreak = windowHeight*0.03
+
+    svg
+      .append("text")
+      .attr("class", "takeaways")
+      .style("font-size", "1.1vw")
+      .attr("text-anchor", "middle")
+      .attr("transform", `translate(${-outerRadius - ((windowWidth/2 - outerRadius) * 0.9) + textboxWidth/2}, ${-windowHeight/2*0.75 + lineBreak} )`)
+      .text("Purpose")
+
     svg
       .append("text")
       .attr("class", "background")
-      .style("font-size", "1vw")
+      .style("font-size", "0.9vw")
       .attr("text-anchor", "middle")
-      .attr("transform", `translate(${-windowWidth/3}, ${-windowHeight/2.8})`)
+      .attr("transform", `translate(${-outerRadius - ((windowWidth/2 - outerRadius) * 0.9) + textboxWidth/2}, ${-windowHeight/2*0.75 + lineBreak*2})`)
       .text("Explore international migration for work by the home countries with the highest and lowest rates of return.")
     svg.select(".background")
-      .call(wrap, windowWidth/6);
+      .call(wrap, textboxWidth - 5);
 
     svg
       .append("text")
@@ -221,53 +246,52 @@ Promise.all([
       .style("font-size", "1vw")
       .style("font-style", "italic")
       .attr("text-anchor", "middle")
-      .attr("transform", `translate(${-windowWidth/3}, ${-windowHeight/4})`)
+      .attr("transform", `translate(${-outerRadius - ((windowWidth/2 - outerRadius) * 0.9) + textboxWidth/2}, ${-windowHeight/2*0.75 + lineBreak*6})`)
       .text("Hover over a bar to see destination countries by that home country!")
     svg.select(".instructions")
-      .call(wrap, windowWidth/6);
-
-    var lineBreak = windowHeight*0.03
+      .call(wrap, textboxWidth - 5);
 
     svg
       .append("text")
       .attr("class", "takeaways")
-      .style("font-size", "1vw")
+      .style("font-size", "1.1vw")
       .attr("text-anchor", "middle")
-      .attr("transform", `translate(${-windowWidth/3}, ${windowHeight/4} )`)
+      .attr("transform", `translate(${-outerRadius - ((windowWidth/2 - outerRadius) * 0.9) + textboxWidth/2}, ${-windowHeight/2*0.75 + lineBreak*11})`)
       .text("Takeaways")
     svg
       .append("text")
       .attr("class", "takeaways")
-      .style("font-size", "0.8vw")
+      .style("font-size", "0.9vw")
       .attr("text-anchor", "middle")
-      .attr("transform", `translate(${-windowWidth/3}, ${windowHeight/4 + lineBreak})`)
+      .attr("transform", `translate(${-outerRadius - ((windowWidth/2 - outerRadius) * 0.9) + textboxWidth/2}, ${-windowHeight/2*0.75 + lineBreak*13})`)
       .text("Return rate tends to be inversely proportional to median time spent abroad (ie the higher the return rate, the shorter the time spent abroad and vice versa).")
     svg
       .append("text")
       .attr("class", "takeaways")
-      .style("font-size", "0.8vw")
+      .style("font-size", "0.9vw")
       .attr("text-anchor", "middle")
-      .attr("transform", `translate(${-windowWidth/3}, ${windowHeight/4 + lineBreak*3})`)
+      .attr("transform", `translate(${-outerRadius - ((windowWidth/2 - outerRadius) * 0.9) + textboxWidth/2}, ${-windowHeight/2*0.75 + lineBreak*17})`)
       .text("Some exceptions are the US and New Zealand (where both return rate and time spent abroad are high) and Tunisia (where both are low).")
     svg
       .append("text")
       .attr("class", "takeaways")
-      .style("font-size", "0.8vw")
+      .style("font-size", "0.9vw")
       .attr("text-anchor", "middle")
-      .attr("transform", `translate(${-windowWidth/3}, ${windowHeight/4 + lineBreak*5})`)
+      .attr("transform", `translate(${-outerRadius - ((windowWidth/2 - outerRadius) * 0.9) + textboxWidth/2}, ${-windowHeight/2*0.75 + lineBreak*21})`)
       .text("Considering only the top 5 destination countries for each home country visualized, the most popular destinations by number of migrants are the UK, the US, Germany, Canada and Switzerland.")
    svg.selectAll(".takeaways")
-      .call(wrap, windowWidth/2 - outerRadius);
+      .call(wrap, textboxWidth - 5);
 
     svg
       .append("text")
       .attr("class", "notes")
       .style("font-size", "0.8vw")
       .attr("text-anchor", "middle")
-      .attr("transform", `translate(${windowWidth/3}, ${outerRadius})`)
-      .text("This dataset was filtered for periods of time spent abroad between 3 months and 40 years. Only countries with 10,000+ migrants were visualized.")
+      .attr("transform", `translate(${windowWidth/2*0.7}, ${windowHeight/4})`)
+      .text("This dataset was filtered for periods of time spent abroad between 3 months and 40 years. Only countries with 10,000+ migrants were visualized. \
+      For each home country, the 5 most popular destination countries (by number of migrants) are shown by name in the pie chart, and migrants to all other destination countries are summed under 'Other'.")
     svg.selectAll(".notes")
-      .call(wrap, windowWidth/2 - outerRadius);
+      .call(wrap, (windowWidth/2 - outerRadius)*0.7);
 
     // Append text on an arc
 

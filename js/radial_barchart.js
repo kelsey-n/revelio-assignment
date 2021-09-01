@@ -10,7 +10,7 @@ var margin = {top: 0, right: 0, bottom: 0, left: 0},
     width = windowWidth - margin.left - margin.right,
     height = windowHeight - margin.top - margin.bottom,
     innerRadius = windowHeight / 6,
-    outerRadius = Math.min(width, height) / 2 - 65;   // the outerRadius goes from the middle of the SVG area to the border, with some extra room for the top longer bars
+    outerRadius = Math.min(width, height) / 2 - (windowHeight*0.09); //65  // the outerRadius goes from the middle of the SVG area to the border, with some extra room for the top longer bars
 
 // append the svg object to the body of the page
 var svg = d3.select("#radial-chart")
@@ -102,10 +102,9 @@ Promise.all([
     bars.on("mousemove", function(event, d) {
       pie_svg.style('opacity', 1)
       tooltip.html(d.home_country + "<br/>"  + d.return_rate + "% return rate"  + "<br/>"  + d.median_timespent_abroad + " median years abroad")
-          //.style("left", (event.pageX + 15) + "px")
-          //.style("top", (event.pageY + 15) + "px");
-          .style("left", (event.pageX - 155) + "px")
-          .style("top", (event.pageY -55) + "px");
+      // Position tooltip based on mouse position relative to top & left of window
+      event.pageY < windowHeight/2 ? tooltip.style("top", (event.pageY - 55) + "px") : tooltip.style("top", (event.pageY + 15) + "px")
+      event.pageX < windowWidth/2 ? tooltip.style("left", (event.pageX - 155) + "px") : tooltip.style("left", (event.pageX + 15) + "px")
     })
 
     bars.on("mouseleave", function(event, d) {
@@ -118,7 +117,6 @@ Promise.all([
         tooltip.transition()
             .duration(500)
             .style("opacity", 0);
-
       });
 
 
@@ -166,7 +164,7 @@ Promise.all([
           .attr("transform", function(d) { return "rotate(" + ((x(d.home_country) + x.bandwidth() / 2) * 180 / Math.PI - 90) + ")"+"translate(" + (y(d.return_rate)+10) + ",0)"; })
         .append("text")
           .attr("transform", function(d) { return (x(d.home_country) + x.bandwidth() / 2 + Math.PI) % (2 * Math.PI) < Math.PI ? "rotate(180)" : "rotate(0)"; })
-          .style("font-size", "13px")
+          .style("font-size", "1.9vh")
           //.attr("alignment-baseline", "middle")
           .attr("fill", "none")
           .attr("stroke", "#ffffffdd")
@@ -181,7 +179,7 @@ Promise.all([
           .attr("transform", function(d) { return "rotate(" + ((x(d.home_country) + x.bandwidth() / 2) * 180 / Math.PI - 90) + ")"+"translate(" + (y(d.return_rate)+10) + ",0)"; })
         .append("text")
           .attr("transform", function(d) { return (x(d.home_country) + x.bandwidth() / 2 + Math.PI) % (2 * Math.PI) < Math.PI ? "rotate(180)" : "rotate(0)"; })
-          .style("font-size", "12px")
+          .style("font-size", "1.8vh")
           //.attr("alignment-baseline", "middle")
           .text(function(d){return(d.home_country)})
 
@@ -191,13 +189,14 @@ Promise.all([
       .attr("transform", "translate(20,20)");
 
     var legendLinear = d3.legendColor()
-      .shapeWidth(30)
+      .shapeWidth(windowWidth*0.017) //30
       .orient('horizontal')
       .title('Median Years Spent Abroad')
       .scale(barColor);
 
     svg.select(".legendLinear")
       .attr("transform", `translate(${windowWidth/3.5}, ${-windowHeight/4})`)
+      .attr("font-size", "0.9vw")
       .call(legendLinear);
 
     // Add title
@@ -213,7 +212,7 @@ Promise.all([
     svg
       .append("text")
       .attr("class", "instructions-center")
-      .style("font-size", "11px")
+      .style("font-size", "0.7vw")
       .attr("text-anchor", "middle")
       //.attr("x", windowWidth/2 - radius*2)
       //.attr("transform", `translate(0, ${-radius/4})`)
@@ -224,8 +223,19 @@ Promise.all([
 
     svg
       .append("text")
+      .attr("class", "background")
+      .style("font-size", "1vw")
+      .attr("text-anchor", "middle")
+      .attr("transform", `translate(${-windowWidth/3}, ${-windowHeight/2.8})`)
+      .text("Explore international migration for work by the home countries with the highest and lowest rates of return.")
+    // wrap text
+    svg.select(".background")
+      .call(wrap, windowWidth/6);
+
+    svg
+      .append("text")
       .attr("class", "instructions")
-      .style("font-size", "15px")
+      .style("font-size", "1vw")
       .style("font-style", "italic")
       .attr("text-anchor", "middle")
       .attr("transform", `translate(${-windowWidth/3}, ${-windowHeight/4})`)
@@ -234,44 +244,33 @@ Promise.all([
     svg.select(".instructions")
       .call(wrap, windowWidth/6);
 
-    svg
-      .append("text")
-      .attr("class", "background")
-      .style("font-size", "15px")
-      .attr("text-anchor", "middle")
-      .attr("transform", `translate(${-windowWidth/3}, ${-windowHeight/2.8})`)
-      .text("Explore international migration for work by the home countries with the highest and lowest rates of return.")
-    // wrap text
-    svg.select(".background")
-      .call(wrap, windowWidth/6);
-
     var lineBreak = 20
 
     svg
       .append("text")
       .attr("class", "takeaways")
-      .style("font-size", "15px")
+      .style("font-size", "1vw")
       .attr("text-anchor", "middle")
       .attr("transform", `translate(${-windowWidth/3}, ${windowHeight/4} )`)
       .text("Takeaways")
     svg
       .append("text")
       .attr("class", "takeaways")
-      .style("font-size", "12px")
+      .style("font-size", "0.8vw")
       .attr("text-anchor", "middle")
       .attr("transform", `translate(${-windowWidth/3}, ${windowHeight/4 + lineBreak})`)
       .text("Insert Takeaway 1 here.................. ........................................................ .........................................................")
     svg
       .append("text")
       .attr("class", "takeaways")
-      .style("font-size", "12px")
+      .style("font-size", "0.8vw")
       .attr("text-anchor", "middle")
       .attr("transform", `translate(${-windowWidth/3}, ${windowHeight/4 + lineBreak*3})`)
       .text("Insert Takeaway 2 here.................. ........................................................ .........................................................")
     svg
       .append("text")
       .attr("class", "takeaways")
-      .style("font-size", "12px")
+      .style("font-size", "0.8vw")
       .attr("text-anchor", "middle")
       .attr("transform", `translate(${-windowWidth/3}, ${windowHeight/4 + lineBreak*5})`)
       .text("Insert Takeaway 3 here.................. ........................................................ .........................................................")
@@ -282,28 +281,28 @@ Promise.all([
     svg
       .append("text")
       .attr("class", "notes")
-      .style("font-size", "15px")
+      .style("font-size", "1vw")
       .attr("text-anchor", "middle")
       .attr("transform", `translate(${windowWidth/3}, ${windowHeight/4})`)
       .text("Notes on the Data")
     svg
       .append("text")
       .attr("class", "notes")
-      .style("font-size", "12px")
+      .style("font-size", "0.8vw")
       .attr("text-anchor", "middle")
       .attr("transform", `translate(${windowWidth/3}, ${windowHeight/4 + lineBreak})`)
       .text("Insert Note 1 here.................. ........................................................ .........................................................")
     svg
       .append("text")
       .attr("class", "notes")
-      .style("font-size", "12px")
+      .style("font-size", "0.8vw")
       .attr("text-anchor", "middle")
       .attr("transform", `translate(${windowWidth/3}, ${windowHeight/4 + lineBreak*3})`)
       .text("Insert Note 2 here.................. ........................................................ .........................................................")
     svg
       .append("text")
       .attr("class", "notes")
-      .style("font-size", "12px")
+      .style("font-size", "0.8vw")
       .attr("text-anchor", "middle")
       .attr("transform", `translate(${windowWidth/3}, ${windowHeight/4 + lineBreak*5})`)
       .text("Insert Note 3 here.................. ........................................................ .........................................................")
@@ -325,6 +324,7 @@ Promise.all([
       .attr("xlink:href", "#title") //place the ID of the path here
       .style("text-anchor","middle") //place the text halfway on the arc
       .attr("startOffset", "31%")
+      .attr("font-size", "1.8vh")
       .text("Return Rate (%)");
 
     svg.append("path")
@@ -340,7 +340,8 @@ Promise.all([
      .append("textPath") //append a textPath to the text element
       .attr("xlink:href", "#highest") //place the ID of the path here
       .style("text-anchor","middle") //place the text halfway on the arc
-      .attr("startOffset", "30%")
+      .attr("startOffset", "22%")
+      .attr("font-size", "1.8vh")
       .text("Highest Return Rates");
 
     svg.append("path")
@@ -356,7 +357,8 @@ Promise.all([
      .append("textPath") //append a textPath to the text element
       .attr("xlink:href", "#lowest") //place the ID of the path here
       .style("text-anchor","middle") //place the text halfway on the arc
-      .attr("startOffset", "75%")
+      .attr("startOffset", "83%")
+      .attr("font-size", "1.8vh")
       .text("Lowest Return Rates");
 
 });
@@ -410,7 +412,7 @@ function drawPieChart(pieData_homeCountry) {
           var midAngle = d.endAngle < Math.PI ? d.startAngle/2 + d.endAngle/2 : d.startAngle/2  + d.endAngle/2 + Math.PI ;
           var extraRotation = d.endAngle-d.startAngle > Math.PI ? "rotate(180)" : "rotate(0)"
           return "translate(" + labelArc.centroid(d)[0] + "," + labelArc.centroid(d)[1] + ") rotate(-90) rotate(" + (midAngle * 180/Math.PI) + ")" + extraRotation; })
-        .style("font-size", "11px")
+        .style("font-size", "0.7vw")
         //.attr("text-anchor", function(d) { return (labelArc(d) + (d.endAngle-d.startAngle)/2 + Math.PI) % (2 * Math.PI) < Math.PI ? "end" : "start"; })
         .attr("text-anchor", "middle")
 

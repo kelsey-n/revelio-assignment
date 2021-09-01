@@ -244,7 +244,7 @@ Promise.all([
     svg.select(".instructions")
       .call(wrap, windowWidth/6);
 
-    var lineBreak = 20
+    var lineBreak = windowHeight*0.03 //20
 
     svg
       .append("text")
@@ -259,53 +259,53 @@ Promise.all([
       .style("font-size", "0.8vw")
       .attr("text-anchor", "middle")
       .attr("transform", `translate(${-windowWidth/3}, ${windowHeight/4 + lineBreak})`)
-      .text("Insert Takeaway 1 here.................. ........................................................ .........................................................")
+      .text("Return rate tends to be inversely proportional to median time spent abroad (ie the higher the return rate, the shorter the time spent abroad and vice versa).")
     svg
       .append("text")
       .attr("class", "takeaways")
       .style("font-size", "0.8vw")
       .attr("text-anchor", "middle")
       .attr("transform", `translate(${-windowWidth/3}, ${windowHeight/4 + lineBreak*3})`)
-      .text("Insert Takeaway 2 here.................. ........................................................ .........................................................")
+      .text("Some exceptions are the US and New Zealand (where both return rate and time spent abroad are high) and Tunisia (where both are low).")
     svg
       .append("text")
       .attr("class", "takeaways")
       .style("font-size", "0.8vw")
       .attr("text-anchor", "middle")
       .attr("transform", `translate(${-windowWidth/3}, ${windowHeight/4 + lineBreak*5})`)
-      .text("Insert Takeaway 3 here.................. ........................................................ .........................................................")
+      .text("Considering only the top 5 destination countries for each home country visualized, the most popular destinations by number of migrants are the UK, the US, Germany, Canada and Switzerland.")
     // wrap text
     svg.selectAll(".takeaways")
       .call(wrap, windowWidth/2 - outerRadius);
 
-    svg
-      .append("text")
-      .attr("class", "notes")
-      .style("font-size", "1vw")
-      .attr("text-anchor", "middle")
-      .attr("transform", `translate(${windowWidth/3}, ${windowHeight/4})`)
-      .text("Notes on the Data")
-    svg
-      .append("text")
-      .attr("class", "notes")
-      .style("font-size", "0.8vw")
-      .attr("text-anchor", "middle")
-      .attr("transform", `translate(${windowWidth/3}, ${windowHeight/4 + lineBreak})`)
-      .text("Insert Note 1 here.................. ........................................................ .........................................................")
+    // svg
+    //   .append("text")
+    //   .attr("class", "notes")
+    //   .style("font-size", "1vw")
+    //   .attr("text-anchor", "middle")
+    //   .attr("transform", `translate(${windowWidth/3}, ${windowHeight/4})`)
+    //   .text("Notes on the Data")
     svg
       .append("text")
       .attr("class", "notes")
       .style("font-size", "0.8vw")
       .attr("text-anchor", "middle")
-      .attr("transform", `translate(${windowWidth/3}, ${windowHeight/4 + lineBreak*3})`)
-      .text("Insert Note 2 here.................. ........................................................ .........................................................")
-    svg
-      .append("text")
-      .attr("class", "notes")
-      .style("font-size", "0.8vw")
-      .attr("text-anchor", "middle")
-      .attr("transform", `translate(${windowWidth/3}, ${windowHeight/4 + lineBreak*5})`)
-      .text("Insert Note 3 here.................. ........................................................ .........................................................")
+      .attr("transform", `translate(${windowWidth/3}, ${outerRadius})`)
+      .text("This dataset was filtered for periods of time spent abroad between 3 months and 40 years. Only countries with 10,000+ migrants were visualized.")
+    // svg
+    //   .append("text")
+    //   .attr("class", "notes")
+    //   .style("font-size", "0.8vw")
+    //   .attr("text-anchor", "middle")
+    //   .attr("transform", `translate(${windowWidth/3}, ${windowHeight/4 + lineBreak*3})`)
+    //   .text("The data was filtered for values of time spent abroad between 3 months and 40 years. Only countries with 10,000+ migrants were visualized.")
+    // svg
+    //   .append("text")
+    //   .attr("class", "notes")
+    //   .style("font-size", "0.8vw")
+    //   .attr("text-anchor", "middle")
+    //   .attr("transform", `translate(${windowWidth/3}, ${windowHeight/4 + lineBreak*5})`)
+    //   .text("Insert Note 3 here.................. ........................................................ .........................................................")
     // wrap text
     svg.selectAll(".notes")
       .call(wrap, windowWidth/2 - outerRadius);
@@ -333,7 +333,7 @@ Promise.all([
         .innerRadius(0)
         .outerRadius(windowHeight/2)
         .startAngle(0)
-        .endAngle(Math.PI/2*3))
+        .endAngle(Math.PI))
     .style("fill", "none")
     //Create an SVG text element and append a textPath element
     svg.append("text")
